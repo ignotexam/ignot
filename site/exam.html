@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exam - ignot</title>
+<meta name="description" content="One ignot exam: its seal, its questions, every model's replies, and a check you can run in your browser.">
+<meta property="og:title" content="Exam - ignot">
+<meta property="og:description" content="One ignot exam: its seal, its questions, every model's replies, and a check you can run in your browser.">
+<!--part:head-->
+<script type="module" src="/src/exam.ts"></script>
+</head>
+<body>
+<!--part:nav-->
+<main class="page">
+  <div class="wrap">
+    <h1 id="title"></h1>
+    <p class="lead" id="state"></p>
+    <dl class="facts" id="facts"></dl>
+
+    <h2>Check it here</h2>
+    <p class="lead">Your browser fetches the files, asks drand for the round's signature, opens the paper, rebuilds every question from the revealed seed and grades every reply again.</p>
+    <p><button class="button" id="verify" type="button">Run every check</button></p>
+    <ul class="checks" id="checks"></ul>
+
+    <div id="results" hidden>
+      <div class="board-head">
+        <h2>Results</h2>
+        <div class="tracks" role="group" aria-label="Track">
+          <button type="button" data-track="same-budget" aria-pressed="true">Same budget</button>
+          <button type="button" data-track="unlimited" aria-pressed="false">No limit</button>
+        </div>
+      </div>
+      <p class="track-note"></p>
+      <div class="skyline-frame">
+        <p class="skyline-key" aria-hidden="true">height: right answers<span>sphere: cheapest right answer</span><span>under each: what one right answer cost</span></p>
+        <div class="skyline" aria-hidden="true"></div>
+      </div>
+      <div class="table"></div>
+    </div>
+
+    <div id="paper" hidden>
+      <h2>Questions and replies</h2>
+      <p class="lead">Open a question to read it, its answer key, and what each model wrote.</p>
+      <ol class="questions" id="questions"></ol>
+    </div>
+  </div>
+</main>
+<!--part:footer-->
+</body>
+</html>

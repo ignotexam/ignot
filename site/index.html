@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ignot</title>
+<meta name="description" content="A weekly exam for AI models, sealed until a public clock opens it. Check the seal and grade every answer yourself.">
+<meta property="og:title" content="ignot">
+<meta property="og:description" content="A weekly exam for AI models, sealed until a public clock opens it. Check the seal and grade every answer yourself.">
+<meta property="og:url" content="https://ignot.io/">
+<link rel="canonical" href="https://ignot.io/">
+<!--part:head-->
+<script>
+  // How the first screen arrives is decided before anything is drawn. "opening": the lids part on the horizon.
+  // "arrive": the short version, for a reader coming back from another page here. Neither: it is simply there.
+  (function () {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || location.hash) return;
+    var nav = performance.getEntriesByType("navigation")[0] || {};
+    var inside = nav.type === "back_forward" || (nav.type !== "reload" && document.referrer.indexOf(location.origin + "/") === 0);
+    document.documentElement.className = inside ? "arrive go" : "opening";
+  })();
+</script>
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body>
+<!--part:nav-->
+<main>
+<section class="hero" id="top" data-name="The clock">
+  <div class="stage">
+    <div class="track" aria-hidden="true"><span class="line"></span><span class="travelled"></span><span class="ring"></span></div>
+    <i class="standin" aria-hidden="true"></i>
+    <canvas class="scene" aria-hidden="true"></canvas>
+    <div class="grab" aria-hidden="true"></div>
+    <p class="hint" aria-hidden="true">try to pull it early</p>
+
+    <div class="clock" aria-label="Next exam">
+      <p class="clock-name"></p>
+      <p class="clock-time" role="timer"></p>
+      <p class="clock-date"></p>
+      <p class="clock-round"></p>
+    </div>
+
+    <div class="words">
+      <h1><span>The exam no model has seen.</span></h1>
+      <p class="mirror" aria-hidden="true"><span>The exam no model has seen.</span></p>
+      <div class="floor">
+        <p class="lede">Every week one exam is locked to a public clock. When it opens, every model sits it at once, and anyone can grade the answers again.</p>
+        <div class="check">
+          <button class="button" type="button" id="check">Check the seal</button>
+          <p class="check-result" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <i class="lid lid-top" aria-hidden="true"></i>
+  <i class="lid lid-bottom" aria-hidden="true"></i>
+</section>
+
+<section class="paper band-glass" id="paper" data-name="The paper">
+  <div class="tape" aria-hidden="true"><div class="tape-run" id="tape"></div></div>
+  <div class="wrap two">
+    <div>
+      <h2>Your paper is already on the desk.</h2>
+      <p class="lead"><span data-next="title"></span> has been lying here face down since it was sealed. <span data-next="questions"></span> questions and their answer keys are inside. Go on, turn it over.</p>
+      <p class="rises" style="--i:2"><button class="button light" type="button" id="turn">Turn it over</button></p>
+      <p class="say" id="turn-result" aria-live="polite"></p>
+      <dl class="envelope rises" id="envelope" style="--i:3"></dl>
+    </div>
+    <div class="desk" aria-hidden="true">
+      <div class="sheet">
+        <div class="sheet-back">
+          <p class="sheet-head"><span>ignot</span><span data-next="title"></span></p>
+          <p class="sheet-cipher"></p>
+          <p class="sheet-foot">sealed until drand round <span data-next="round"></span></p>
+        </div>
+        <div class="sheet-front">
+          <p class="sheet-head"><span>ignot</span><span data-next="title"></span></p>
+          <ol class="sheet-questions"></ol>
+        </div>
+      </div>
+      <span class="pencil"></span>
+    </div>
+  </div>
+  <div class="wrap kinds" id="kinds" hidden>
+    <div>
+      <h3>Ten kinds of question, five levels each.</h3>
+      <p class="lead"><span id="kinds-from"></span> has been opened, so here is what was on it. The next paper holds the same ten kinds, and nobody has seen which questions.</p>
+      <div class="kind-list" id="kind-list" role="group" aria-label="Kinds of question"></div>
+    </div>
+    <div class="slip" id="slip" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="how band-paper" id="how" data-name="How it stays sealed">
+  <div class="wrap">
+    <h2>Sealed by a clock nobody owns.</h2>
+    <div class="pulse rises" id="pulse" style="--i:1">
+      <div class="pulse-now">
+        <p class="pulse-label">drand quicknet, the round now</p>
+        <p class="pulse-round" id="pulse-round"></p>
+        <i class="pulse-run" id="pulse-run" aria-hidden="true"></i>
+        <p class="pulse-next" id="pulse-next"></p>
+      </div>
+      <div class="pulse-sig">
+        <p class="pulse-label">its signature, made by the League of Entropy's nodes together</p>
+        <p class="pulse-hex" id="pulse-hex" aria-hidden="true"></p>
+        <p class="pulse-check" id="pulse-check" aria-live="polite">When this part of the page is on screen, each new round is fetched from drand and checked here against its public key.</p>
+      </div>
+    </div>
+    <ol class="steps">
+      <li>
+        <p class="fact" id="fact-sealed"></p>
+        <h3>Locked to a round</h3>
+        <p>The questions and their keys are encrypted to a future round of drand, the public randomness beacon run by the League of Entropy. The hashes are written down first.</p>
+      </li>
+      <li>
+        <p class="fact" id="fact-opened"></p>
+        <h3>Opened by the round</h3>
+        <p>When the round arrives, its signature is the key. Everyone can decrypt at the same second. Nobody can before, and that includes us.</p>
+      </li>
+      <li>
+        <p class="fact" id="fact-graded"></p>
+        <h3>Graded by anyone</h3>
+        <p>Every reply is kept. Grading is mechanical, so you can run it again and get the same scores and the same root.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="board band-paper" id="leaderboard" data-name="Leaderboard">
+  <div class="wrap">
+    <div class="board-head">
+      <div>
+        <h2>The price of intelligence</h2>
+        <p class="lead" id="board-sub"></p>
+      </div>
+      <div class="tracks rises" role="group" aria-label="Track" style="--i:2">
+        <button type="button" data-track="same-budget" aria-pressed="true">Same budget</button>
+        <button type="button" data-track="unlimited" aria-pressed="false">No limit</button>
+      </div>
+    </div>
+    <p class="track-note rises" id="track-note" style="--i:2"></p>
+    <div class="skyline-frame">
+      <p class="skyline-key" aria-hidden="true">height: right answers<span>sphere: cheapest right answer</span><span>under each: what one right answer cost</span></p>
+      <div class="skyline" aria-hidden="true"></div>
+    </div>
+    <div class="table rises" id="board" style="--i:3"></div>
+    <p class="board-foot rises" id="board-foot" style="--i:4"></p>
+  </div>
+</section>
+
+<section class="answers band-paper" id="answers" data-name="Every answer" hidden>
+  <div class="wrap">
+    <h2>Every answer, on one sheet.</h2>
+    <p class="lead" id="answers-sub"></p>
+    <div class="ans-grid rises" id="ans-grid" style="--i:2" role="img"></div>
+    <p class="ans-key rises" style="--i:3"><span><i class="r"></i>right</span><span><i class="w"></i>wrong</span><span><i class="n"></i>no answer</span><span id="ans-read">In each group of three the questions get harder from left to right.</span></p>
+  </div>
+</section>
+
+<section class="exams band-paper" id="exams" data-name="Exams">
+  <div class="wrap">
+    <h2>Every exam, sealed or open</h2>
+    <div class="exam-list rises" id="exam-list"></div>
+  </div>
+</section>
+
+<section class="seal band-glass" id="seal" data-name="Seal a file">
+  <div class="wrap two">
+    <div>
+      <h2>Seal something of your own.</h2>
+      <p class="lead">The same lock, for anything: a prediction, a test set, a letter. It happens in this page. Nothing is uploaded.</p>
+      <p class="mono-note rises" style="--i:2">From a terminal: <code>ignot seal-file notes.txt --open +10m</code></p>
+      <div class="receipt rises" id="receipt" style="--i:3">
+        <p class="receipt-head"><span>ignot</span><span id="receipt-title">your seal, before it is made</span></p>
+        <p class="receipt-round">drand round <b id="receipt-round"></b></p>
+        <p class="receipt-when" id="receipt-when"></p>
+        <p class="receipt-in">opens in <b id="receipt-in"></b></p>
+        <pre class="receipt-file" id="receipt-file" hidden></pre>
+      </div>
+    </div>
+    <form class="tool rises" id="seal-form" style="--i:2">
+      <label for="seal-text">What to seal</label>
+      <textarea id="seal-text" rows="4" placeholder="A prediction, a test set, a letter"></textarea>
+      <label class="file">or a file <input type="file" id="seal-file"></label>
+      <fieldset>
+        <legend>Opens in</legend>
+        <label><input type="radio" name="when" value="600000" checked><span>10 minutes</span></label>
+        <label><input type="radio" name="when" value="3600000"><span>1 hour</span></label>
+        <label><input type="radio" name="when" value="86400000"><span>1 day</span></label>
+        <label><input type="radio" name="when" value="604800000"><span>1 week</span></label>
+      </fieldset>
+      <div class="tool-actions">
+        <button class="button light" type="submit">Seal it</button>
+        <label class="button ghost">Open a sealed file <input type="file" id="open-file" accept=".age,text/plain"></label>
+      </div>
+      <p class="say" id="seal-result" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<section class="night" id="night" data-name="Exam Night">
+  <img class="night-hall" src="/hall.webp" alt="" width="2016" height="672" loading="lazy" decoding="async">
+  <div class="wrap">
+    <h2>Exam Night</h2>
+    <p class="lead">Once a week the seal breaks in public. Every model sits the same paper, and every answer is published with its price.</p>
+    <p class="night-next rises" id="night-next" style="--i:2"></p>
+  </div>
+</section>
+
+<section class="stump band-tosca" id="stump" data-name="Stump them">
+  <div class="wrap two">
+    <div>
+      <h2>Think you can stump them?</h2>
+      <p class="lead">Burn a fixed amount of the token to put one question of your own into the next exam. It is sealed like ours: nobody reads it before the round, and the models meet it cold.</p>
+      <p class="rises" style="--i:2"><span class="state">Opens with the token.</span></p>
+    </div>
+    <div class="stump-side">
+      <div class="stump-slip rises" style="--i:2" aria-hidden="true">
+        <p class="stump-slip-head"><span>a question, sealed</span><span>to round <span data-next="round"></span></span></p>
+        <pre class="stump-cipher" id="stump-cipher"></pre>
+        <p class="stump-burn">burn <span>0x000000000000000000000000000000000000dEaD</span></p>
+      </div>
+      <ul class="rules">
+        <li>The burn goes straight to the dead address. The contract never holds a token.</li>
+        <li>One question, at most 4,096 bytes once it is sealed.</li>
+        <li>Entries close at each exam's deadline.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="faq band-paper" id="faq" data-name="Fair questions">
+  <div class="wrap two">
+    <div>
+      <h2>Fair questions.</h2>
+      <p class="lead">The short answers. The long ones are in the <a href="/docs.html">docs</a>, and the code is the longest.</p>
+    </div>
+    <div class="asks rises" style="--i:2">
+      <details>
+        <summary>Can anyone read the exam before it opens?</summary>
+        <p>No. The paper is encrypted to a drand round that has not happened yet. The key is that round's signature, and it does not exist until the League of Entropy's nodes produce it together. That includes us.</p>
+      </details>
+      <details>
+        <summary>What stops you from swapping the paper afterwards?</summary>
+        <p>The hash of the sealed file and the hash of the paper inside it are published with the seal, before the round. After the round anyone can open the file and compare both.</p>
+      </details>
+      <details>
+        <summary>Who grades the answers?</summary>
+        <p>Nobody. Every reply must end with a line that starts with ANSWER, and grading is mechanical: numbers within 0.005, exact strings, or lists of tokens. Run it again and you get the same scores and the same root.</p>
+      </details>
+      <details>
+        <summary>Why can a famous model score zero?</summary>
+        <p>On the same-budget track every model gets the same money for each question. A model that thinks at length can spend all of it before it answers, and an answer that cost more does not count. The other track has no budget.</p>
+      </details>
+      <details>
+        <summary>Can the questions leak into training data?</summary>
+        <p>Not before they are used. Each paper is generated from a fresh random seed and sealed at once, so no copy of it exists in the open until the round. After that it is public, and the next paper is new.</p>
+      </details>
+      <details>
+        <summary>What is the token for?</summary>
+        <p>One thing: Stump. Burn a fixed amount to put a question of your own into the next exam, sealed like ours. It opens with the token.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="proof band-glass" id="proof" data-name="Check it yourself">
+  <div class="wrap two">
+    <div>
+      <h2>Do not take our word for it.</h2>
+      <p class="lead">Everything on this page can be run again from the repository: the seals, the openings, the grades.</p>
+      <div class="proof-links rises" style="--i:2">
+        <button class="button light" id="proof-run" type="button">Check an exam here</button>
+        <a class="button ghost" id="proof-exam">Open its page</a>
+        <a class="button ghost" data-link="repo">Read the code</a>
+      </div>
+    </div>
+    <div>
+      <ul class="checks" id="proof-checks">
+        <li class="todo">The sealed file matches the hash in the manifest</li>
+        <li class="todo">The open time is the drand round's publish time</li>
+        <li class="todo">The sealed file opens with the beacon and matches the paper's hash</li>
+        <li class="todo">The questions regenerate byte for byte from the revealed seed</li>
+        <li class="todo">Every stored reply grades to the same result again</li>
+        <li class="todo">The results and their Merkle root recompute from the replies</li>
+      </ul>
+      <pre class="term"><code><span class="typed"><span class="dim">$</span> cargo install --path crates/ignot-cli</span>
+<span class="typed"><span class="dim">$</span> ignot verify-all exams</span></code></pre>
+    </div>
+  </div>
+</section>
+</main>
+<!--part:footer-->
+</body>
+</html>

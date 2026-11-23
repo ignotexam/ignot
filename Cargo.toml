@@ -1,0 +1,49 @@
+[workspace]
+resolver = "3"
+members = ["crates/ignot-core", "crates/ignot-cli", "crates/ignot-wasm"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+license = "MIT"
+repository = "https://github.com/ignotexam/ignot"
+
+[workspace.dependencies]
+ignot-core = { path = "crates/ignot-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+thiserror = "2"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+dbg_macro = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+unwrap_used = "deny"
+
+[profile.release]
+lto = "thin"
+strip = false
+
+# The browser build: small first, since every visitor of the verify page downloads it.
+[profile.wasm]
+inherits = "release"
+opt-level = "s"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+
+# Tests run pairings and count through millions of numbers: unoptimised, they take minutes.
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3

@@ -1,0 +1,16 @@
+# The engine reads no clock, no file, no environment and no network: whoever runs it passes in what it needs.
+disallowed-types = [
+    { path = "std::time::SystemTime", reason = "the engine reads no clock" },
+    { path = "std::time::Instant", reason = "the engine reads no clock" },
+    { path = "std::fs::File", reason = "the engine reads no files" },
+    { path = "std::net::TcpStream", reason = "the engine opens no connections" },
+    { path = "std::net::UdpSocket", reason = "the engine opens no connections" },
+]
+disallowed-methods = [
+    { path = "std::fs::read", reason = "the engine reads no files" },
+    { path = "std::fs::read_to_string", reason = "the engine reads no files" },
+    { path = "std::fs::write", reason = "the engine writes no files" },
+    { path = "std::env::var", reason = "the engine reads no environment" },
+    { path = "std::env::var_os", reason = "the engine reads no environment" },
+    { path = "std::thread::sleep", reason = "the engine does not wait" },
+]

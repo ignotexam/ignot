@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The mark alone, for a browser tab: the stem holds the dawn, the copper sphere is its dot. -->
+  <defs>
+    <linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffc277"/>
+      <stop offset=".04" stop-color="#d9772e"/>
+      <stop offset=".12" stop-color="#0d5563"/>
+      <stop offset=".45" stop-color="#03838d"/>
+      <stop offset=".75" stop-color="#19c8bf"/>
+      <stop offset=".93" stop-color="#52f3e3"/>
+      <stop offset="1" stop-color="#22d3c7"/>
+    </linearGradient>
+    <radialGradient id="copper" cx=".36" cy=".28" r=".8">
+      <stop offset="0" stop-color="#fff3dc"/>
+      <stop offset=".1" stop-color="#ffbf82"/>
+      <stop offset=".36" stop-color="#f08a3e"/>
+      <stop offset=".62" stop-color="#cf5e1e"/>
+      <stop offset=".86" stop-color="#8a3110"/>
+      <stop offset="1" stop-color="#561a06"/>
+    </radialGradient>
+    <clipPath id="ball"><circle cx="32" cy="13" r="11"/></clipPath>
+  </defs>
+  <rect x="21" y="28" width="22" height="36" fill="url(#dawn)"/>
+  <circle cx="32" cy="13" r="11" fill="url(#copper)"/>
+  <g clip-path="url(#ball)">
+    <path d="M19 14.8c7 2.3 19 2.3 26 0V25H19z" fill="#431404" opacity=".42"/>
+    <ellipse cx="32" cy="24.6" rx="6.5" ry="1.6" fill="#ffc37c" opacity=".85"/>
+  </g>
+</svg>

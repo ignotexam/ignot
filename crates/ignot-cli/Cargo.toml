@@ -1,0 +1,24 @@
+[package]
+name = "ignot-cli"
+description = "The ignot command line: make, seal, open, run and verify sealed exams for AI models."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "ignot"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.9", features = ["derive"] }
+getrandom = "0.2"
+ignot-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+ureq = { version = "3.5.2", default-features = false, features = ["rustls"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,12 @@
+/target/
+node_modules/
+dist/
+site/src/wasm/
+.env
+.env.*
+*.plain.json
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+.DS_Store
+*.partial*

@@ -1,0 +1,32 @@
+[package]
+name = "ignot-core"
+description = "Sealed exams for AI models: generate, timelock to a drand round, open, grade and verify."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+age = { version = "0.11", default-features = false, features = ["armor"] }
+age-core = "0.11"
+ark-bls12-381 = "0.6"
+ark-ec = "0.6"
+ark-ff = "0.6"
+ark-serialize = "0.6"
+base64 = "0.21"
+chacha20poly1305 = "0.10"
+getrandom = "0.2"
+hmac = "0.12"
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+sha3 = "0.10"
+thiserror = { workspace = true }
+
+# In a browser the only source of randomness is the page's crypto object.
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }
+
+[lints]
+workspace = true

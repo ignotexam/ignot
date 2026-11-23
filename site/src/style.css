@@ -1,0 +1,741 @@
+@font-face {
+  font-family: "Jost";
+  src: url("/fonts/Jost.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Sometype Mono";
+  src: url("/fonts/SometypeMono.woff2") format("woff2");
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+:root {
+  --ink: #011017;
+  --ink-2: #05332f; /* secondary text on the floor, tinted from its own hue */
+  --paper: #f4fcfb;
+  --copper: #e2925f;
+  --sans: "Jost", "Futura", "Century Gothic", system-ui, sans-serif;
+  --mono: "Sometype Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gutter: clamp(20px, 5vw, 72px);
+  --out: cubic-bezier(0.16, 1, 0.3, 1); /* arrivals */
+  --in-out: cubic-bezier(0.77, 0, 0.175, 1); /* things that travel across the screen */
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  background: #013f4a;
+  scrollbar-color: #0e6b72 #013f4a;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+p,
+h1 {
+  margin: 0;
+}
+body {
+  background: #011017;
+}
+::selection {
+  background: var(--copper);
+  color: var(--ink);
+}
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* The sky, the horizon and the floor. The four numbers are the layout the 3D scene shares; main.ts reads them. */
+.hero {
+  --horizon: 66; /* % of the height, from the top */
+  --mono-h: 33; /* monolith height, % of the height */
+  --x0: 7; /* where the week starts, % of the width */
+  --x1: 78; /* where the monolith stands */
+  --clock-rides: 1; /* the clock stands under the monolith and travels with it when the page opens */
+  --h: calc(var(--horizon) * 1%);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: 100svh;
+  min-height: 680px;
+}
+/* Everything on the first screen lives on one stage, so it can fall behind the next ground as one piece */
+.stage {
+  position: absolute;
+  inset: 0;
+}
+/* The dawn: sky, horizon at --h, polished floor. The first screen stands in it, and so does the skyline of scores. */
+.stage,
+.skyline {
+  background:
+    url("/noise.png") 0 0 / 64px 64px,
+    radial-gradient(60% 10% at 50% var(--h), rgb(200 255 246 / 0.42), rgb(200 255 246 / 0)),
+    linear-gradient(
+      to bottom,
+      #013f4a 0,
+      #014959 calc(var(--h) * 0.17),
+      #015e6f calc(var(--h) * 0.4),
+      #01838f calc(var(--h) * 0.64),
+      #13c2ba calc(var(--h) * 0.87),
+      #34e5d5 calc(var(--h) * 0.972),
+      #43f2e1 var(--h),
+      #1fd0c3 calc(var(--h) + 2.2%),
+      #13c3b8 calc(var(--h) + 6%),
+      #0ebbb2 calc(var(--h) + 15%),
+      #03a9a3 100%
+    );
+  background-blend-mode: overlay, normal, normal;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.scene.on {
+  opacity: 1;
+}
+
+/* The header stays with the reader: part of the sky over the first screen, black glass everywhere else */
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px; /* the same in every state, so the header can stand still while pages change under it */
+  padding: 0 var(--gutter);
+  transition: background-color 0.25s;
+}
+.nav.solid,
+.nav.open {
+  background: var(--ink);
+}
+.wordmark {
+  display: block;
+  color: var(--paper);
+}
+.wordmark svg {
+  display: block;
+  width: auto;
+  height: 38px;
+}
+.nav nav {
+  display: flex;
+  gap: clamp(18px, 2.6vw, 38px);
+}
+.nav nav a {
+  position: relative;
+  padding: 10px 0;
+  font: 500 clamp(15.5px, 0.95vw, 18px) / 1 var(--sans);
+  color: rgb(244 252 251 / 0.86);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+/* a line draws under the link in reach, and stays, in copper, under the section being read */
+.nav nav a::after {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  left: 0;
+  height: 1.5px;
+  content: "";
+  background: currentColor;
+  scale: 0 1;
+  transform-origin: 0 50%;
+  transition: scale 0.25s var(--out);
+}
+.nav nav a:hover,
+.nav nav a.here {
+  color: var(--paper);
+}
+.nav nav a:hover::after,
+.nav nav a.here::after {
+  scale: 1 1;
+}
+.nav nav a.here::after {
+  background: var(--copper);
+}
+.top-mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 28px;
+}
+.menu {
+  display: none;
+  padding: 9px 13px;
+  font: 600 15px/1 var(--sans);
+  color: var(--paper);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1.5px rgb(244 252 251 / 0.6);
+}
+@media (max-width: 760px) {
+  .menu {
+    display: block;
+  }
+  .nav nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    padding: 4px var(--gutter) 18px;
+    background: rgb(1 16 23 / 0.97);
+  }
+  .nav.open nav {
+    display: flex;
+  }
+  .nav nav a {
+    padding: 16px 0;
+    font-size: 1.15rem;
+    border-top: 1px solid #12383e;
+  }
+  .nav nav a::after {
+    display: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .nav nav {
+      opacity: 0;
+      translate: 0 -8px;
+      transition:
+        opacity 0.22s var(--out),
+        translate 0.22s var(--out),
+        display 0.22s allow-discrete;
+    }
+    .nav.open nav {
+      opacity: 1;
+      translate: 0 0;
+      @starting-style {
+        opacity: 0;
+        translate: 0 -8px;
+      }
+    }
+  }
+}
+
+/* The week, drawn in the sky: a line from seven days out to the monolith. Placed by main.ts. */
+.track,
+.clock,
+.grab,
+.hint {
+  visibility: hidden;
+}
+.ready .track,
+.ready .clock,
+.ready .grab,
+.ready .hint {
+  visibility: visible;
+}
+.track {
+  position: absolute;
+  z-index: 1;
+  top: var(--ty);
+  left: var(--tx0);
+  width: calc(var(--tx1) - var(--tx0));
+  height: 0;
+}
+.track .line {
+  position: absolute;
+  top: -1px;
+  right: calc(var(--u) * 0.5);
+  left: 0;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgb(244 252 251 / 0.5) 0 5px, transparent 5px 13px);
+}
+.track .travelled {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--copper);
+  transform: scaleX(0); /* hero.ts stretches it to the sphere */
+  transform-origin: 0 50%;
+}
+.track .ring {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: var(--u);
+  height: var(--u);
+  margin: calc(var(--u) * -0.5) 0 0 calc(var(--u) * -0.5);
+  border: 1.5px solid rgb(244 252 251 / 0.55);
+  border-radius: 50%;
+}
+.track .tick {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 8px;
+  background: rgb(244 252 251 / 0.6);
+}
+.track .tick span {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  font: 500 clamp(11px, 0.8vw, 13px) / 1 var(--mono);
+  color: var(--paper);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.grab {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: var(--u);
+  height: var(--u);
+  margin: calc(var(--u) * -0.5) 0 0 calc(var(--u) * -0.5);
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+}
+.grab.held {
+  cursor: grabbing;
+}
+/* Without WebGL: the monolith in the colours sampled from its face, standing on the floor with its reflection, and the
+   sphere as the logo's own picture on the element that follows it */
+.standin {
+  display: none;
+}
+.flat .standin {
+  position: absolute;
+  top: calc(var(--my) - var(--u) * 2.25);
+  left: calc(var(--mx, var(--tx1)) - var(--u) * 0.5);
+  display: block;
+  width: var(--u);
+  height: calc(var(--u) * 2.25);
+  background: linear-gradient(#064247 0, #053f44 8%, #04383e 23%, #012e36 36%, #02282d 50%, #07262a 67%, #072223 85%, #052726 100%);
+  box-shadow: inset 0 1.5px 0 #2b7f85;
+  -webkit-box-reflect: below 0 linear-gradient(transparent 72%, rgb(0 0 0 / 0.24)); /* the mask is the element's own way up: its foot is the bottom */
+}
+.flat .grab {
+  background: url("/sphere-256.webp") center / cover;
+}
+.open .grab {
+  cursor: default;
+}
+.hint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  font: 500 clamp(13.5px, 1vw, 15px) / 1 var(--sans);
+  font-feature-settings: "tnum";
+  color: rgb(244 252 251 / 0.92);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The clock stands under the monolith, on the floor */
+.clock {
+  position: absolute;
+  top: calc(var(--my) + var(--u) * 0.45);
+  left: var(--tx1);
+  z-index: 4;
+  color: var(--ink);
+  text-align: center;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.clock-name {
+  font: 500 clamp(15px, 1vw, 18px) / 1.2 var(--sans);
+  color: var(--ink-2);
+}
+.clock-time {
+  margin-top: 4px;
+  font: 600 clamp(2.1rem, 3.5vw, 3.6rem) / 1.05 var(--sans);
+  font-feature-settings: "tnum";
+  letter-spacing: -0.01em;
+}
+.clock-date {
+  margin-top: 8px;
+  font: 500 clamp(16px, 1.05vw, 19px) / 1.3 var(--sans);
+}
+.clock-round {
+  margin-top: 6px;
+  font: 400 clamp(12.5px, 0.8vw, 14.5px) / 1.3 var(--mono);
+  color: var(--ink-2);
+}
+
+/* The headline stands on the horizon like the monolith does: its baseline is the horizon line, and the polished
+   floor shows it back. 0.1425em is where Jost's baseline sits above the bottom of a 0.98 line. */
+.words {
+  color: var(--ink);
+}
+.hero h1,
+.mirror {
+  position: absolute;
+  left: var(--gutter);
+  z-index: 4;
+  width: min(60vw, 12.5em);
+  font: 600 clamp(2.6rem, min(6vw, 10.4vh), 5.75rem) / 0.98 var(--sans);
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+.hero h1 span,
+.mirror span {
+  display: block;
+  text-wrap: balance;
+}
+.hero h1 {
+  bottom: calc(100% - var(--h) - 0.1425em);
+}
+.mirror {
+  top: calc(var(--h) - 0.1425em);
+  clip-path: inset(0 0 0.1425em 0); /* nothing of a reflection shows above the horizon (the box is flipped) */
+  opacity: 0.2;
+  pointer-events: none;
+  user-select: none;
+  transform: scaleY(-1);
+  mask-image: linear-gradient(to top, #000 0.12em, transparent 0.7em);
+}
+.floor {
+  position: absolute;
+  top: calc(var(--h) + clamp(48px, 7.4vh, 68px));
+  left: var(--gutter);
+  z-index: 4;
+  width: min(46vw, 42rem);
+}
+.lede {
+  max-width: 34em;
+  font: 400 clamp(1.05rem, 1.25vw, 1.4rem) / 1.5 var(--sans);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.check {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  align-items: center;
+  margin-top: 20px;
+}
+.button {
+  position: relative;
+  padding: 0.95em 1.25em;
+  font: 600 clamp(16px, 1.05vw, 19px) / 1 var(--sans);
+  color: var(--paper);
+  background: var(--ink);
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.12s var(--out);
+}
+/* the copper line of the week, drawn under whatever is about to be pressed */
+.button::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  content: "";
+  background: var(--copper);
+  scale: 0 1;
+  transform-origin: 0 50%;
+  transition: scale 0.22s var(--out);
+}
+.button:focus-visible::after {
+  scale: 1 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    background: #0a2a33;
+  }
+  .button:hover::after {
+    scale: 1 1;
+  }
+}
+.button:active {
+  transform: scale(0.97);
+}
+.button:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+.button:disabled::after {
+  scale: 0 1;
+}
+.check-result {
+  max-width: 31em;
+  font: 400 clamp(12.5px, 0.8vw, 14.5px) / 1.5 var(--mono);
+  color: var(--ink-2);
+}
+.check-result.ok,
+.check-result.bad {
+  color: var(--ink);
+}
+.check-result svg {
+  width: 13px;
+  height: 13px;
+  margin-right: 7px;
+  vertical-align: -2px;
+}
+
+/* ---- The page opens. Two black lids part on the horizon line; behind them the mark stands whole, the sphere over
+   the monolith. Then the monolith moves to its place and the sphere slides back along the week to where time is
+   (hero.ts drives those two and the clock's digits). Everything else is timed here from the same start, html.go.
+   html.opening is the whole of it; html.arrive is the short version, without the lids, for a reader coming back
+   from another page. Any key, wheel or touch ends it at once. With motion off neither class is set. */
+.lid {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .opening {
+    --lead: 0s;
+  }
+  .arrive {
+    --lead: 1.05s; /* the short version starts where the lids would have finished */
+  }
+
+  /* Before the start the lids are shut but for a line of first light. If the script never runs, they open anyway. */
+  .opening .lid {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 8;
+    display: block;
+    background: var(--ink);
+  }
+  .opening .lid-top {
+    top: 0;
+    height: var(--h);
+    animation:
+      peek-up 0.9s 0.15s var(--out) both,
+      lid-up 1.1s 5s var(--in-out) forwards;
+  }
+  .opening .lid-bottom {
+    top: var(--h);
+    bottom: 0;
+    animation:
+      peek-down 0.9s 0.15s var(--out) both,
+      lid-down 1.1s 5s var(--in-out) forwards;
+  }
+  .opening:not(.go) .words,
+  .opening:not(.go) .nav {
+    animation: held 5s step-end;
+  }
+  .opening.go .lid-top {
+    animation: lid-up 1.1s var(--in-out) both;
+  }
+  .opening.go .lid-bottom {
+    animation: lid-down 1.1s var(--in-out) both;
+  }
+
+  .go .clock {
+    animation: rise 0.7s max(0s, 1s - var(--lead)) var(--out) both;
+  }
+  .go .hero h1 {
+    clip-path: inset(-0.4em -0.2em 0.1425em -0.2em); /* the horizon cuts it while it rises */
+  }
+  .go .hero h1 span,
+  .go .mirror span {
+    animation: from-horizon 0.95s calc(1.3s - var(--lead)) var(--out) both;
+  }
+  .opening.go .nav {
+    animation: fade 0.7s 1.5s both; /* only in the full opening: a reader arriving from another page keeps the header */
+  }
+  .go .floor > * {
+    animation: rise 0.7s calc(1.7s - var(--lead)) var(--out) both;
+  }
+  .go .floor > :nth-child(2) {
+    animation-delay: calc(1.82s - var(--lead));
+  }
+  .go .track .line {
+    animation: draw 0.8s calc(1.9s - var(--lead)) var(--out) both;
+  }
+  .go .track .tick {
+    animation: fade 0.4s calc(1.95s - var(--lead) + var(--i) * 0.045s) both;
+  }
+  .go .track .ring {
+    animation: fade 0.6s calc(2.3s - var(--lead)) both;
+  }
+  .go .hint {
+    animation: fade 0.6s calc(3.3s - var(--lead)) both;
+  }
+  .opening:not(.go) :is(.rail, .rail-dot) {
+    visibility: hidden;
+  }
+  .go :is(.rail, .rail-dot) {
+    animation: fade 0.6s calc(2.6s - var(--lead)) both;
+  }
+}
+@keyframes peek-up {
+  to {
+    translate: 0 -2px;
+  }
+}
+@keyframes peek-down {
+  to {
+    translate: 0 1px;
+  }
+}
+@keyframes lid-up {
+  from {
+    translate: 0 -2px;
+  }
+  to {
+    translate: 0 -101%;
+  }
+}
+@keyframes lid-down {
+  from {
+    translate: 0 1px;
+  }
+  to {
+    translate: 0 101%;
+  }
+}
+@keyframes held {
+  from,
+  to {
+    visibility: hidden;
+  }
+}
+@keyframes from-horizon {
+  from {
+    translate: 0 100%;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/* Scrolling on, the first screen falls behind the next ground: it moves at a little over half the page's speed
+   and darkens, so the black glass seems to slide over it. Where the browser cannot tie motion to scroll, it scrolls. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero {
+      view-timeline: --ground block;
+    }
+    .stage {
+      animation: fall-behind linear both;
+      animation-timeline: --ground;
+      animation-range: exit;
+    }
+    .hero::after {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      pointer-events: none;
+      content: "";
+      background: var(--ink);
+      opacity: 0;
+      animation: darken linear both;
+      animation-timeline: --ground;
+      animation-range: exit;
+    }
+  }
+}
+@keyframes fall-behind {
+  to {
+    translate: 0 40svh;
+  }
+}
+@keyframes darken {
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* Narrow or tall screens: the headline moves up into the dark of the sky, the clock sits beside the monolith's
+   reflection, and the rest keeps the floor. The page may be taller than the screen here. */
+@media (max-width: 960px), (max-aspect-ratio: 4/5) {
+  .hero {
+    --horizon: 50;
+    --mono-h: 17;
+    --x0: 9;
+    --x1: 80;
+    --clock-rides: 0;
+    height: auto;
+    min-height: max(860px, 100svh);
+  }
+  .hero h1 {
+    top: 78px;
+    right: var(--gutter);
+    bottom: auto;
+    width: auto;
+    font-size: clamp(2.2rem, 10vw, 3.4rem);
+    color: var(--paper);
+  }
+  .go .hero h1 {
+    clip-path: none;
+  }
+  .go .hero h1 span {
+    animation-name: rise;
+  }
+  .mirror {
+    display: none;
+  }
+  .clock {
+    top: calc(var(--my) + var(--u) * 0.62);
+    right: var(--gutter);
+    left: auto;
+    text-align: right;
+    transform: none;
+  }
+  .clock-date {
+    font-size: 15px;
+  }
+  .floor {
+    top: auto;
+    right: var(--gutter);
+    bottom: clamp(24px, 4vh, 44px);
+    width: auto;
+  }
+  .track .tick span {
+    font-size: 10.5px;
+  }
+}
+/* Phones: the idle seal line waits until the check has something to say; two-part lines break at the dot */
+@media (max-width: 520px) {
+  .check-result:not(.ok, .bad) {
+    display: none;
+  }
+  .clock .sep {
+    display: none;
+  }
+  .clock .local {
+    display: block;
+  }
+}

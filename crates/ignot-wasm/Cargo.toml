@@ -1,0 +1,22 @@
+[package]
+name = "ignot-wasm"
+description = "The ignot engine for browsers: seal, open and verify without a server."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ignot-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+# Pinned to the version of the wasm-bindgen command that writes the JavaScript glue: the two must match.
+wasm-bindgen = "=0.2.130"
+
+[lints]
+workspace = true
