@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "name": "ignot",
+  "id": "pilot-00",
+  "examId": "0xb452d3025a425d77490be35505c08633e12d82a9013ae68eabff98c9f9434c01",
+  "title": "Pilot 00",
+  "openAt": "2026-11-23T05:55:00.000Z",
+  "openRound": 34203312,
+  "drandChain": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+  "ciphertextSha256": "0x4c8a9a8461f184066ef0f9975c0de3dab071c298bd31e8229466347f291c7903",
+  "plaintextSha256": "0x4a4a57d4c1317eb771e1adeaa41366dcebbfa49346d9f3dbfa27152e2caf390d",
+  "questionCount": 30,
+  "generator": {
+    "name": "ignot",
+    "version": "1",
+    "commit": "e17c19a2929831d3cf6175710526a65e7832e223"
+  }
+}
