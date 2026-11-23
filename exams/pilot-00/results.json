@@ -1,0 +1,89 @@
+{
+  "format": 1,
+  "examId": "pilot-00",
+  "budgetNanoUsd": 20000000,
+  "tracks": [
+    {
+      "track": "same-budget",
+      "models": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "correct": 22,
+          "total": 30,
+          "costNanoUsd": 247259977,
+          "costPerCorrectNanoUsd": 11239090
+        },
+        {
+          "model": "anthropic/claude-haiku-5.5",
+          "correct": 21,
+          "total": 30,
+          "costNanoUsd": 201126200,
+          "costPerCorrectNanoUsd": 9577438
+        },
+        {
+          "model": "openai/gpt-6.1-terra",
+          "correct": 14,
+          "total": 30,
+          "costNanoUsd": 377667000,
+          "costPerCorrectNanoUsd": 26976214
+        },
+        {
+          "model": "openai/gpt-6-luna",
+          "correct": 13,
+          "total": 30,
+          "costNanoUsd": 165427075,
+          "costPerCorrectNanoUsd": 12725160
+        },
+        {
+          "model": "anthropic/claude-fable-5.2",
+          "correct": 0,
+          "total": 30,
+          "costNanoUsd": 180816000,
+          "costPerCorrectNanoUsd": null
+        },
+        {
+          "model": "google/gemini-4-neon",
+          "correct": 0,
+          "total": 30,
+          "costNanoUsd": 429960000,
+          "costPerCorrectNanoUsd": null
+        }
+      ]
+    },
+    {
+      "track": "unlimited",
+      "models": [
+        {
+          "model": "openai/gpt-6.1-terra",
+          "correct": 29,
+          "total": 30,
+          "costNanoUsd": 514162000,
+          "costPerCorrectNanoUsd": 17729724
+        },
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "correct": 21,
+          "total": 30,
+          "costNanoUsd": 455608408,
+          "costPerCorrectNanoUsd": 21695638
+        },
+        {
+          "model": "anthropic/claude-haiku-5.5",
+          "correct": 18,
+          "total": 30,
+          "costNanoUsd": 211233700,
+          "costPerCorrectNanoUsd": 11735206
+        },
+        {
+          "model": "openai/gpt-6-luna",
+          "correct": 13,
+          "total": 30,
+          "costNanoUsd": 146785670,
+          "costPerCorrectNanoUsd": 11291205
+        }
+      ]
+    }
+  ],
+  "leafCount": 300,
+  "resultsRoot": "0x7704915c1b555cdf81b56ac9d89cec0a532a29a6a8c8118eba374454d12c0723"
+}
