@@ -293,7 +293,9 @@ mod tests {
             writer.write_all(b"written by the age crate").unwrap();
             let file = writer.finish().unwrap();
             let end = file.windows(5).position(|w| w == b"\n--- ").unwrap();
-            assert_eq!(std::str::from_utf8(&file[..end]).unwrap().matches("-> ").count(), 2);
+            let header = std::str::from_utf8(&file[..end]).unwrap();
+            // A stanza is a line that starts with "-> "; the random recipient's arguments can hold "-> " too.
+            assert_eq!(header.lines().filter(|line| line.starts_with("-> ")).count(), 2, "{header}");
             assert_eq!(sealed_round(&file).unwrap(), ROUND);
             assert_eq!(open_bytes(&file, &beacon()).unwrap(), b"written by the age crate");
         }
