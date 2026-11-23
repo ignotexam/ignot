@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "engine": "cargo build -p ignot-wasm --target wasm32-unknown-unknown --profile wasm && wasm-bindgen --target web --out-dir src/wasm ../target/wasm32-unknown-unknown/wasm/ignot_wasm.wasm",
+    "engine": "RUSTFLAGS=\"$RUSTFLAGS --remap-path-prefix=$HOME=~\" cargo build -p ignot-wasm --target wasm32-unknown-unknown --profile wasm && wasm-bindgen --target web --out-dir src/wasm ../target/wasm32-unknown-unknown/wasm/ignot_wasm.wasm",
     "dev": "vite",
     "build": "npm run engine && tsc --noEmit && vite build",
     "preview": "vite preview"
